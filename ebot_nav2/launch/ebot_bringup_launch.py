@@ -194,6 +194,13 @@ def generate_launch_description():
                               'use_respawn': use_respawn,
                               'container_name': 'nav2_container'}.items()),
     ])
+    
+    nav_cmd = Node(
+        package='ebot_nav2',
+        executable='ebot_nav_cmd.py',
+        name='ebot_nav_cmd',
+        output='screen'
+    )
 
     ld = LaunchDescription()
     ld.add_action(stdout_linebuf_envvar)
@@ -214,6 +221,7 @@ def generate_launch_description():
     ld.add_action(robot_localization_node)
     ld.add_action(bringup_cmd_group)
 
+    # ld.add_action(nav_cmd)
 
 
     return ld
