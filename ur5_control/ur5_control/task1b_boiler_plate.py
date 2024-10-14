@@ -2,7 +2,6 @@ import rclpy
 import sys
 import cv2
 import math
-import rosbag2_py
 import tf2_ros
 import numpy as np
 from rclpy.node import Node
@@ -115,7 +114,6 @@ class aruco_tf(Node):
 
     def process_image(self):
         if self.cv_image is None or self.depth_image is None:
-            self.get_logger().warn("No image or depth data received yet")
             return
 
         sizeCamX = 1280
@@ -128,7 +126,6 @@ class aruco_tf(Node):
         center_aruco_list, _, angle_aruco_list, width_aruco_list, ids = detect_aruco(self.current_rgb_image)
 
         if not ids:
-            print("No markers detected")
             return
 
         for idx, marker_id in enumerate(ids):
