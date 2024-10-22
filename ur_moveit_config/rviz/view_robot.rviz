@@ -354,6 +354,12 @@ Visualization Manager:
           Value: true
         base_link_inertia:
           Value: false
+        cam_1:
+          Value: false
+        cam_3:
+          Value: false
+        cam_49:
+          Value: false
         camera_bottom_screw_frame:
           Value: false
         camera_color_frame:
@@ -384,6 +390,12 @@ Visualization Manager:
           Value: false
         ft_frame:
           Value: false
+        obj_1:
+          Value: true
+        obj_3:
+          Value: true
+        obj_49:
+          Value: true
         odom:
           Value: false
         shoulder_link:
@@ -425,6 +437,12 @@ Visualization Manager:
                           ft_frame:
                             {}
             camera_link:
+              cam_1:
+                {}
+              cam_3:
+                {}
+              cam_49:
+                {}
               camera_bottom_screw_frame:
                 camera_link_depth:
                   camera_depth_frame:
@@ -439,6 +457,12 @@ Visualization Manager:
                     camera_right_ir_frame:
                       camera_right_ir_optical_frame:
                         {}
+            obj_1:
+              {}
+            obj_3:
+              {}
+            obj_49:
+              {}
           odom:
             {}
       Update Interval: 0
@@ -455,7 +479,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -476,7 +500,7 @@ Visualization Manager:
         Value: /camera/depth/color/points
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -523,7 +547,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 6.619869709014893
+      Distance: 5.637534141540527
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -538,10 +562,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8103986978530884
+      Pitch: 0.6453989744186401
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.1885743141174316
+      Yaw: 0.7485752701759338
     Saved: ~
 Window Geometry:
   Displays:
