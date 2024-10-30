@@ -348,18 +348,44 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        FUS1:
+          Value: false
+        FUS2:
+          Value: false
+        FUS3:
+          Value: false
+        FUS4:
+          Value: false
+        FWL:
+          Value: false
+        FWR:
+          Value: false
+        LHUS10:
+          Value: false
+        LHUS9:
+          Value: false
+        RHUS7:
+          Value: false
+        RHUS9:
+          Value: false
+        RWL:
+          Value: false
+        RWR:
+          Value: false
         base:
           Value: false
+        base_footprint:
+          Value: false
         base_link:
-          Value: true
+          Value: false
         base_link_inertia:
           Value: false
-        cam_1:
-          Value: false
-        cam_3:
-          Value: false
-        cam_49:
-          Value: false
+        cam_12:
+          Value: true
+        cam_4:
+          Value: true
+        cam_5:
+          Value: true
         camera_bottom_screw_frame:
           Value: false
         camera_color_frame:
@@ -375,12 +401,16 @@ Visualization Manager:
         camera_left_ir_optical_frame:
           Value: false
         camera_link:
-          Value: true
+          Value: false
         camera_link_depth:
           Value: false
         camera_right_ir_frame:
           Value: false
         camera_right_ir_optical_frame:
+          Value: false
+        ebot_base:
+          Value: false
+        ebot_base_link:
           Value: false
         ee_link:
           Value: false
@@ -390,17 +420,25 @@ Visualization Manager:
           Value: false
         ft_frame:
           Value: false
-        obj_1:
+        imu_link:
+          Value: false
+        laser:
+          Value: false
+        obj_12:
           Value: true
-        obj_3:
+        obj_4:
           Value: true
-        obj_49:
+        obj_5:
           Value: true
         odom:
           Value: false
         shoulder_link:
           Value: false
         tool0:
+          Value: false
+        ultrasonic_rl:
+          Value: false
+        ultrasonic_rr:
           Value: false
         upper_arm_link:
           Value: false
@@ -437,11 +475,11 @@ Visualization Manager:
                           ft_frame:
                             {}
             camera_link:
-              cam_1:
+              cam_12:
                 {}
-              cam_3:
+              cam_4:
                 {}
-              cam_49:
+              cam_5:
                 {}
               camera_bottom_screw_frame:
                 camera_link_depth:
@@ -457,14 +495,49 @@ Visualization Manager:
                     camera_right_ir_frame:
                       camera_right_ir_optical_frame:
                         {}
-            obj_1:
+            obj_12:
               {}
-            obj_3:
+            obj_4:
               {}
-            obj_49:
+            obj_5:
               {}
           odom:
-            {}
+            ebot_base_link:
+              FWL:
+                {}
+              FWR:
+                {}
+              RWL:
+                {}
+              RWR:
+                {}
+              base_footprint:
+                {}
+              ebot_base:
+                FUS1:
+                  {}
+                FUS2:
+                  {}
+                FUS3:
+                  {}
+                FUS4:
+                  {}
+                LHUS10:
+                  {}
+                LHUS9:
+                  {}
+                RHUS7:
+                  {}
+                RHUS9:
+                  {}
+                imu_link:
+                  {}
+                laser:
+                  {}
+                ultrasonic_rl:
+                  {}
+                ultrasonic_rr:
+                  {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -479,7 +552,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -500,7 +573,7 @@ Visualization Manager:
         Value: /camera/depth/color/points
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -562,10 +635,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6453989744186401
+      Pitch: 0.465399831533432
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.7485752701759338
+      Yaw: 5.476735591888428
     Saved: ~
 Window Geometry:
   Displays:
