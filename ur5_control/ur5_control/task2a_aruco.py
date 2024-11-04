@@ -86,7 +86,7 @@ class aruco_tf(Node):
         self.color_cam_sub = self.create_subscription(Image, '/camera/color/image_raw', self.colorimagecb, 10)
         self.depth_cam_sub = self.create_subscription(Image, '/camera/aligned_depth_to_color/image_raw', self.depthimagecb, 10)
 
-        image_processing_rate = 0.2                                                     
+        image_processing_rate = 0.5                                                     
         self.bridge = CvBridge()                                                        
         self.tf_buffer = tf2_ros.buffer.Buffer()                                        
         self.listener = tf2_ros.TransformListener(self.tf_buffer, self)

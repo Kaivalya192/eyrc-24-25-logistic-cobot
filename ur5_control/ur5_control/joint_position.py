@@ -36,7 +36,7 @@ class EndEffectorPosition(Node):
             # Lookup transform from 'base_link' to 'ee_link'
             transform: TransformStamped = self.tf_buffer.lookup_transform(
                 'base_link',  # Reference frame
-                'ee_link',    # Target frame
+                'obj_5',    # Target frame
                 rclpy.time.Time()  # Get the latest transform
             )
             
