@@ -10,6 +10,7 @@ from geometry_msgs.msg import TransformStamped
 from scipy.spatial.transform import Rotation as R
 from sensor_msgs.msg import Image
 from rclpy.time import Time
+from std_msgs.msg import Int32MultiArray as Mu
 
 def calculate_rectangle_area(coordinates):
     x = [coord[0] for coord in coordinates]
@@ -90,7 +91,8 @@ class aruco_tf(Node):
         self.bridge = CvBridge()                                                        
         self.tf_buffer = tf2_ros.buffer.Buffer()                                        
         self.listener = tf2_ros.TransformListener(self.tf_buffer, self)
-        self.br = tf2_ros.TransformBroadcaster(self)                                    
+        self.br = tf2_ros.TransformBroadcaster(self)
+        self.aruco_ids_pub = self.create_publisher(Mu, '/aruco_ids', 10)                              
         self.timer = self.create_timer(image_processing_rate, self.process_image)       
         self.current_rgb_image = None
         self.cv_image = None                                                            
@@ -161,7 +163,7 @@ class aruco_tf(Node):
             y = distance_from_rgb * (sizeCamY - cY - centerCamY) / focalY
             z = distance_from_rgb
 
-            cv2.circle(self.current_rgb_image, (int(cX), int(cY)), 5, (0, 255, 0), -1)
+            # cv2.circle(self.current_rgb_image, (int(cX), int(cY)), 5, (0, 255, 0), -1)
 
             transform = TransformStamped()
             transform.header.stamp = self.get_clock().now().to_msg()
@@ -190,9 +192,14 @@ class aruco_tf(Node):
             obj_transform.transform = transform.transform
 
             self.br.sendTransform(obj_transform)
-
-        cv2.imshow("Aruco Detection", self.current_rgb_image)
-        cv2.waitKey(1)
+            
+            
+        ids.sort()
+        msg=Mu()
+        msg.data = ids
+        self.aruco_ids_pub.publish(msg)
+        # cv2.imshow("Aruco Detection", self.current_rgb_image)
+        # cv2.waitKey(1)
 
 def main():
     rclpy.init(args=sys.argv)                                       
