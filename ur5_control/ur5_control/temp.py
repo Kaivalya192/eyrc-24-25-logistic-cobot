@@ -8,7 +8,7 @@ from std_srvs.srv import Trigger
 from linkattacher_msgs.srv import AttachLink, DetachLink
 from servo_msgs.srv import ServoLink
 from tf_transformations import euler_from_quaternion
-
+from std_msgs.msg import Int32MultiArray as Mu
 
 class ServoController(Node):
     def __init__(self):
@@ -18,7 +18,7 @@ class ServoController(Node):
         self.detach_client = self.create_client(DetachLink, '/GripperMagnetOFF')
         self.remove_client = self.create_client(ServoLink, '/SERVOLINK')
         self.servo_client = self.create_client(Trigger, '/servo_node/start_servo')
-        
+
         self.initial_rotation = None
         self.wrist_initial_position = None
         self.intermediate_poses = {}
@@ -27,7 +27,9 @@ class ServoController(Node):
 
         self.wait_for_services([self.attach_client, self.detach_client, self.remove_client, self.servo_client])
 
-        self.pose_sequence = ['obj_1', 'int', 'obj_12', 'int', 'obj_2', 'int', 'obj_12']
+        self.pose_sequence = []
+        self.sequence_captured = False
+        self.sequence_completed = False
         
         self.target_transforms = {}
         self.current_pose_index = 0
@@ -35,14 +37,32 @@ class ServoController(Node):
 
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
+        self.publisher = self.create_publisher(TwistStamped, '/servo_node/delta_twist_cmds', 10)
 
         if self.start_servo():
-            time.sleep(1)
-            self.publisher = self.create_publisher(TwistStamped, '/servo_node/delta_twist_cmds', 10)
-            print("first pose")
-            print(self.pose_sequence[self.current_pose_index])
-            self.create_timer(0.008, self.publish_twist)
+            self.subscription = self.create_subscription(Mu, '/aruco_ids', self.aruco_ids_callback, 10)
 
+    def aruco_ids_callback(self, msg):
+        if not self.sequence_captured:
+            self.pose_sequence = []
+            for i in range(len(msg.data)):
+                id = msg.data[i]
+                if id != 12:
+                    if f"obj_{id}" not in self.pose_sequence:
+                        self.pose_sequence.append(f"obj_{id}")
+                        self.pose_sequence.append("int")
+                        self.pose_sequence.append("obj_12")
+                        self.pose_sequence.append("int")
+                        
+            self.sequence_captured = True
+            self.get_logger().info("Pose Sequence"+str(self.pose_sequence))
+            
+        if len(self.pose_sequence) >= 3:
+            self.timer = self.create_timer(0.08, self.publish_twist)
+        else:
+            self.get_logger().info("No Aruco Detected")
+            
+            
     def wait_for_services(self, clients):
         for client in clients:
             while not client.wait_for_service(timeout_sec=1.0):
@@ -51,16 +71,19 @@ class ServoController(Node):
     def start_servo(self):
         future = self.servo_client.call_async(Trigger.Request())
         rclpy.spin_until_future_complete(self, future)
+        self.get_logger().info("Servo started")
         return future.result() and future.result().success
 
     def publish_twist(self):
+        if not self.sequence_captured:
+            return
         if not self.transforms_recorded:
             self.record_initial_transforms()
+            self.current_pose_index = 0
             return
-
+        
         current_target = self.pose_sequence[self.current_pose_index]
 
-        # Check if current target is an intermediate pose
         if current_target == 'int':
             prev_object = self.pose_sequence[self.current_pose_index - 1]
             next_object = self.pose_sequence[(self.current_pose_index + 1) % len(self.pose_sequence)]
@@ -80,18 +103,21 @@ class ServoController(Node):
         # Align orientation first, then move to the target position
         if not self.align_orientation(target_transform, effector_transform):
             if not self.move_to_target(target_transform, effector_transform):
-                # Attach/detach logic only applies to main poses
+                print(self.current_pose_index)
+                if self.current_pose_index == len(self.pose_sequence) - 1:
+                    self.get_logger().info("Pose sequence finished")
+                    self.sequence_captured = False
+                    self.transforms_recorded = False
+                    return
                 if current_target != 'int':
                     self.handle_attachment("detach" if current_target == 'obj_12' else "attach")
-                # Move to the next pose in the sequence
+
                 self.current_pose_index = (self.current_pose_index + 1) % len(self.pose_sequence)
-                print("next pose")
-                print(self.pose_sequence[self.current_pose_index])
+                self.get_logger().info(self.pose_sequence[self.current_pose_index])
 
     def record_initial_transforms(self):
         objects_to_record = list(set(self.pose_sequence) - {'int'}) + ['wrist_3_link']
         all_transforms_recorded = True
-
         for obj in objects_to_record:
             if obj not in self.target_transforms:
                 if self.tf_buffer.can_transform('base_link', obj, rclpy.time.Time()):
@@ -108,6 +134,7 @@ class ServoController(Node):
                     elif obj == 'wrist_3_link':
                         self.wrist_initial_position = transform.transform.translation
                 else:
+                    print(f"Transform not available for {obj}")
                     all_transforms_recorded = False
 
         self.transforms_recorded = all_transforms_recorded
@@ -125,8 +152,17 @@ class ServoController(Node):
                     intermediate_transform.transform.translation.x += 0.1
                     
                     self.intermediate_poses[f"{target_object}_to_{next_object}"] = intermediate_transform
+            if self.pose_sequence[-1] == "int":
+                last_object = self.pose_sequence[-2]
+                first_object = self.pose_sequence[0]
+                intermediate_transform = self.tf_buffer.lookup_transform('base_link', 'wrist_3_link', rclpy.time.Time())
+                intermediate_transform.transform.rotation = self.initial_rotation
+                intermediate_transform.transform.translation = self.wrist_initial_position
+                # Move the intermediate pose 10 cm ahead on x
+                intermediate_transform.transform.translation.x += 0.1
+                self.intermediate_poses[f"{last_object}_to_{first_object}"] = intermediate_transform
 
-            print("Recorded Transforms for All Objects and Intermediate Poses")
+            self.get_logger().info("Initial transforms recorded")
 
             # for target_object, transform in self.target_transforms.items():
             #     print(f"{target_object}: {transform}")
@@ -142,14 +178,14 @@ class ServoController(Node):
             request = AttachLink.Request(model1_name=box_name, link1_name='link', model2_name='ur5', link2_name='wrist_3_link')
             self.attach_client.call_async(request)
             self.current_box = box_name
-            print("attached")
+            self.get_logger().info("attached for "+box_name)
         elif action == "detach":
             box_name = self.current_box
             request = DetachLink.Request(model1_name=box_name, link1_name='link', model2_name='ur5', link2_name='wrist_3_link')
             self.detach_client.call_async(request)
             remove_request = ServoLink.Request(box_name=box_name, box_link='link')
             self.remove_client.call_async(remove_request)
-            print("detached and removed for "+box_name)
+            self.get_logger().info("detached for "+box_name)
 
     def align_orientation(self, target_transform, effector_transform):
         target_euler = euler_from_quaternion([

@@ -198,6 +198,7 @@ class aruco_tf(Node):
         msg=Mu()
         msg.data = ids
         self.aruco_ids_pub.publish(msg)
+        self.get_logger().info(f"Published aruco ids: {ids}")
         # cv2.imshow("Aruco Detection", self.current_rgb_image)
         # cv2.waitKey(1)
 
