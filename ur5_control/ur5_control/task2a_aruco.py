@@ -143,7 +143,7 @@ class aruco_tf(Node):
             angle_aruco = angle_aruco_list[idx]
             
             roll = 1.57
-            pitch = -angle_aruco
+            pitch = -angle_aruco*1.3
             yaw = 1.57
             
             qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)

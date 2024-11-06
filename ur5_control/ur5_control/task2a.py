@@ -23,6 +23,7 @@ class ServoController(Node):
         self.wrist_initial_position = None
         self.intermediate_poses = {}
         self.current_box = None
+        self.first_time = True
         self.first_sequence = True
 
 
@@ -104,6 +105,7 @@ class ServoController(Node):
         # Align orientation first, then move to the target position
         if not self.align_orientation(target_transform, effector_transform):
             if not self.move_to_target(target_transform, effector_transform):
+                self.first_time = False
                 if self.current_pose_index == len(self.pose_sequence) - 1:
                     self.get_logger().info("Pose sequence finished")
                     self.sequence_captured = False
@@ -192,6 +194,9 @@ class ServoController(Node):
             self.get_logger().info("detached for "+box_name)
 
     def align_orientation(self, target_transform, effector_transform):
+        if not self.first_time:
+            return False
+        
         target_euler = euler_from_quaternion([
             target_transform.transform.rotation.x,
             target_transform.transform.rotation.y,
@@ -207,7 +212,7 @@ class ServoController(Node):
         ])
         
         delta_orientation_y = target_euler[0] - effector_euler[0]
-        if math.fabs(delta_orientation_y) > 0.2:
+        if math.fabs(delta_orientation_y) > 0.16:
             twist_msg = TwistStamped()
             twist_msg.header.stamp = self.get_clock().now().to_msg()
             twist_msg.header.frame_id = 'base_link'
