@@ -23,6 +23,7 @@ class ServoController(Node):
         self.wrist_initial_position = None
         self.intermediate_poses = {}
         self.current_box = None
+        self.first_sequence = True
 
 
         self.wait_for_services([self.attach_client, self.detach_client, self.remove_client, self.servo_client])
@@ -103,11 +104,11 @@ class ServoController(Node):
         # Align orientation first, then move to the target position
         if not self.align_orientation(target_transform, effector_transform):
             if not self.move_to_target(target_transform, effector_transform):
-                print(self.current_pose_index)
                 if self.current_pose_index == len(self.pose_sequence) - 1:
                     self.get_logger().info("Pose sequence finished")
                     self.sequence_captured = False
                     self.transforms_recorded = False
+                    self.first_sequence = False
                     return
                 if current_target != 'int':
                     self.handle_attachment("detach" if current_target == 'obj_12' else "attach")
@@ -149,7 +150,8 @@ class ServoController(Node):
                     intermediate_transform.transform.rotation = self.initial_rotation
                     intermediate_transform.transform.translation = self.wrist_initial_position
                     # Move the intermediate pose 10 cm ahead on x
-                    intermediate_transform.transform.translation.x += 0.1
+                    if self.first_sequence:
+                        intermediate_transform.transform.translation.x += 0.1
                     
                     self.intermediate_poses[f"{target_object}_to_{next_object}"] = intermediate_transform
             if self.pose_sequence[-1] == "int":
@@ -159,7 +161,8 @@ class ServoController(Node):
                 intermediate_transform.transform.rotation = self.initial_rotation
                 intermediate_transform.transform.translation = self.wrist_initial_position
                 # Move the intermediate pose 10 cm ahead on x
-                intermediate_transform.transform.translation.x += 0.1
+                if self.first_sequence:
+                    intermediate_transform.transform.translation.x += 0.1
                 self.intermediate_poses[f"{last_object}_to_{first_object}"] = intermediate_transform
 
             self.get_logger().info("Initial transforms recorded")
@@ -170,7 +173,8 @@ class ServoController(Node):
             #     print(f"{intermediate_key}: {transform}")
             
             #edit obj_12 move 20 cm up on z
-            self.target_transforms['obj_12'].transform.translation.z += 0.25
+            if self.first_sequence:
+                self.target_transforms['obj_12'].transform.translation.z += 0.20
 
     def handle_attachment(self, action):
         box_name = f"box{self.pose_sequence[self.current_pose_index].split('_')[-1]}"
@@ -203,11 +207,11 @@ class ServoController(Node):
         ])
         
         delta_orientation_y = target_euler[0] - effector_euler[0]
-        if math.fabs(delta_orientation_y) > 0.01:
+        if math.fabs(delta_orientation_y) > 0.2:
             twist_msg = TwistStamped()
             twist_msg.header.stamp = self.get_clock().now().to_msg()
             twist_msg.header.frame_id = 'base_link'
-            twist_msg.twist.angular.y = -0.4 if delta_orientation_y > 0 else 0.4
+            twist_msg.twist.angular.y = -5.0 if delta_orientation_y > 0 else 5.0
             self.publisher.publish(twist_msg)
             return True
         return False
@@ -222,7 +226,7 @@ class ServoController(Node):
             twist_msg = TwistStamped()
             twist_msg.header.stamp = self.get_clock().now().to_msg()
             twist_msg.header.frame_id = 'base_link'
-            scale_factor = 0.3 / distance
+            scale_factor = 10.0 / distance
             twist_msg.twist.linear.x = scale_factor * delta_x
             twist_msg.twist.linear.y = scale_factor * delta_y
             twist_msg.twist.linear.z = scale_factor * delta_z
