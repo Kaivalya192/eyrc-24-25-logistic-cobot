@@ -148,9 +148,9 @@ controller_server:
       acc_lim_x: 1.0 # 2.5
       acc_lim_y: 0.0
       acc_lim_theta: 1.0 #3.2
-      decel_lim_x: -2.5
+      decel_lim_x: -1.0
       decel_lim_y: 0.0
-      decel_lim_theta: -3.2
+      decel_lim_theta: -1.0
 
       vx_samples: 20
       vy_samples: 5
@@ -160,7 +160,7 @@ controller_server:
       linear_granularity: 0.05
       angular_granularity: 0.025
       transform_tolerance: 0.01 #0.1
-      xy_goal_tolerance: 0.1 #0.25
+      xy_goal_tolerance: 0.05 #0.25
       trans_stopped_velocity: 0.25
       short_circuit_trajectory_evaluation: True
       stateful: True

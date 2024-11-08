@@ -36,19 +36,18 @@ class NavigationNode(Node):
             if self.navigate_to_pose(conveyor_2):
                 time.sleep(1)
                 self.dock_action(True, False, 0.0, -1.57)
-                time.sleep(10)
+                time.sleep(5)
                 self.box_action(False, True)
                 time.sleep(1)
                 if self.navigate_to_pose(drop_point_2):
                     time.sleep(1)
                     self.box_action(True, False)
                     time.sleep(1)
-                    if self.navigate_to_pose(intermidiate_pose_1):
-                        if self.navigate_to_pose(conveyor_1):
-                            time.sleep(1)
-                            self.dock_action(True, True, 0.0, -1.57)
-                            time.sleep(10)
-                            self.box_action(False, True)
+                    if self.navigate_to_pose(conveyor_1):
+                        time.sleep(1)
+                        self.dock_action(True, True, 0.0, -1.57)
+                        time.sleep(5)
+                        self.box_action(False, True)
 
         self.check_result()
 
