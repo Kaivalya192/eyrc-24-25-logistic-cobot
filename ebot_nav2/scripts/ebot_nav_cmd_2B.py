@@ -23,8 +23,8 @@ class NavigationNode(Node):
         self.dock_service = self.create_client(DockSw, 'dock_control')
         self.dock_service.wait_for_service()
 
-        drop_point_1 = self.create_pose(0.43, -2.43, 1.57)
-        drop_point_2 = self.create_pose(0.43, -2.43, -1.57)
+        drop_point_1 = self.create_pose(0.43, -2.43, 3.14)
+        drop_point_2 = self.create_pose(0.43, -2.43, 3.14)
         conveyor_2 = self.create_pose(2.32, 2.55, -1.57)
         intermidiate_pose_1 = self.create_pose(-4.2,3.0,3.14)
         conveyor_1 = self.create_pose(-4.4, 2.89, -1.57)
@@ -35,7 +35,8 @@ class NavigationNode(Node):
             time.sleep(1)
             if self.navigate_to_pose(conveyor_2):
                 time.sleep(1)
-                self.dock_action(True, True, 0.0, -1.57)
+                self.dock_action(True, False, 0.0, -1.57)
+                time.sleep(10)
                 self.box_action(False, True)
                 time.sleep(1)
                 if self.navigate_to_pose(drop_point_2):
@@ -46,6 +47,7 @@ class NavigationNode(Node):
                         if self.navigate_to_pose(conveyor_1):
                             time.sleep(1)
                             self.dock_action(True, True, 0.0, -1.57)
+                            time.sleep(10)
                             self.box_action(False, True)
 
         self.check_result()

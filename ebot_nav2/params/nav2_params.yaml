@@ -23,17 +23,17 @@ amcl:
     odom_frame_id: "odom"
     pf_err: 0.01
     pf_z: 0.99
-    recovery_alpha_fast: 0.1 #0
-    recovery_alpha_slow: 0.001 #0
+    recovery_alpha_fast: 0.1
+    recovery_alpha_slow: 0.001
     resample_interval: 1
     robot_model_type: "nav2_amcl::DifferentialMotionModel"
     save_pose_rate: 0.5
     sigma_hit: 0.2
     tf_broadcast: true
-    transform_tolerance: 0.2 #0.5
-    update_min_a: 0.01 #0.2
-    update_min_d: 0.01 #0.25
-    z_hit: 0.95 #0.5
+    transform_tolerance: 0.2
+    update_min_a: 0.01
+    update_min_d: 0.01
+    z_hit: 0.95
     z_max: 0.05
     z_rand: 0.5
     z_short: 0.05
@@ -124,14 +124,14 @@ controller_server:
     # Progress checker parameters
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"
-      required_movement_radius: 0.5
+      required_movement_radius: 0.25 #0.5
       movement_time_allowance: 10.0
 
     general_goal_checker:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.2 #0.25
-      yaw_goal_tolerance: 0.1 #0.25
+      xy_goal_tolerance: 0.1 #0.25
+      yaw_goal_tolerance: 0.005 #0.25
     # DWB parameters
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"
@@ -145,9 +145,9 @@ controller_server:
       max_speed_xy: 0.26
       min_speed_theta: 0.0
 
-      acc_lim_x: 2.5
+      acc_lim_x: 1.0 # 2.5
       acc_lim_y: 0.0
-      acc_lim_theta: 3.2
+      acc_lim_theta: 1.0 #3.2
       decel_lim_x: -2.5
       decel_lim_y: 0.0
       decel_lim_theta: -3.2
@@ -159,8 +159,8 @@ controller_server:
       sim_time: 1.7
       linear_granularity: 0.05
       angular_granularity: 0.025
-      transform_tolerance: 0.2
-      xy_goal_tolerance: 0.15 #0.25
+      transform_tolerance: 0.01 #0.1
+      xy_goal_tolerance: 0.1 #0.25
       trans_stopped_velocity: 0.25
       short_circuit_trajectory_evaluation: True
       stateful: True
@@ -170,10 +170,10 @@ controller_server:
       BaseObstacle.scale: 0.02
 
       PathAlign.scale: 32.0
-      PathAlign.forward_point_distance: 0.1
+      PathAlign.forward_point_distance: 0.3
 
       GoalAlign.scale: 24.0
-      GoalAlign.forward_point_distance: 0.1
+      GoalAlign.forward_point_distance: 0.3
 
       PathDist.scale: 32.0
       GoalDist.scale: 24.0
@@ -203,7 +203,7 @@ local_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0
-        inflation_radius: 0.55
+        inflation_radius: 0.25 #0.55
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
