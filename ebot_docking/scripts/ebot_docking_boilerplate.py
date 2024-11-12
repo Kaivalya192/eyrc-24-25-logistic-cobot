@@ -34,7 +34,7 @@ class MyRobotDockingController(Node):
         self.orientation_dock = False
         self.target_distance = 0.0
         self.target_orientation = 0.0
-        self.distance_tolerance = 0.05  # Adjust as needed
+        self.distance_tolerance = 0.03  # Adjust as needed
         self.orientation_tolerance = math.radians(5)  # 5 degrees tolerance
 
         # Sensor data placeholders
